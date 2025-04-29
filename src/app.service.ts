@@ -11,9 +11,20 @@ export class AppService {
 
   async getFile(): Promise<string> {
     const filePath = path.resolve('./file.csv');
-    const data = await readFile(filePath);
+    const data = await readFile(filePath, 'utf-8');
 
     console.log(data);
+
+    const lines = data.trim().split('\n');
+
+    console.log(lines);
+
+    for (const line of lines) {
+      const [amountStr] = line.split(';');
+      const amount = Number(amountStr);
+
+      console.log(amount);
+    }
 
     return 'teste';
   }
