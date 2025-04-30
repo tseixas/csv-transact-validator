@@ -42,8 +42,6 @@ export class AppService {
       if (amount > MAX_AMOUNT) {
         console.log('Valor suspeito', amount);
       }
-
-      console.log('\n');
     }
 
     return 'teste';
