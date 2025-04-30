@@ -1,5 +1,6 @@
 import { Controller, Get, Post } from '@nestjs/common';
 import { AppService } from './app.service';
+import { Upload } from './app.interface';
 
 @Controller()
 export class AppController {
@@ -11,7 +12,7 @@ export class AppController {
   }
 
   @Post()
-  create(): Promise<string> {
+  create(): Promise<Upload> {
     return this.appService.getFile();
   }
 }
