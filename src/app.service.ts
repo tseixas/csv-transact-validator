@@ -6,6 +6,27 @@ const MSG_NEGATIVE = 'Negativo';
 const MSG_DUPLICATE = 'Duplicado';
 const MSG_SUSPECT = 'Valor suspeito';
 
+function checkDuplicates(data: ResponseOperation[]): ResponseOperation[] {
+  const duplicateList = new Set();
+  const response: ResponseOperation[] = [];
+
+  for (const item of data) {
+    const key = `${item.from}-${item.to}-${item.amount}`;
+    const isDuplicate = duplicateList.has(key);
+
+    response.push({
+      ...item,
+      message: isDuplicate ? MSG_DUPLICATE : item.message,
+    });
+
+    if (!isDuplicate) {
+      duplicateList.add(key);
+    }
+  }
+
+  return response;
+}
+
 @Injectable()
 export class AppService {
   getHello(): string {
@@ -38,6 +59,11 @@ export class AppService {
 
       let info = '';
 
+      // Invalidos: negativos, duplicados
+      // Validos: suspeitos
+
+      console.log('duplicates: ', duplicates);
+
       if (amountValue < 0) {
         info = MSG_NEGATIVE;
       }
@@ -54,6 +80,8 @@ export class AppService {
           amount: amountValue,
           message: info,
         });
+
+        // duplicates.add(lineData);
       } else {
         responseValid.push({
           from: from,
@@ -61,22 +89,17 @@ export class AppService {
           amount: amountValue,
           message: info,
         });
-
-        duplicates.add(lineData);
       }
 
-      console.log('info', info);
-      console.log('has_negativo: ', info.includes(MSG_NEGATIVE));
-      console.log('has_duplicado: ', info.includes(MSG_DUPLICATE));
+      console.log('message: ', info);
+      console.log('has_negativo: ', info === MSG_NEGATIVE);
+      console.log('has_duplicado: ', info === MSG_DUPLICATE);
       console.log('==============================');
     }
 
-    console.log('responseValid: ', responseValid);
-    console.log('responseInvalid: ', responseInvalid);
-
     return {
-      valid: responseValid,
-      invalid: responseInvalid,
+      valid: checkDuplicates(responseValid),
+      invalid: checkDuplicates(responseInvalid),
     };
   }
 }
