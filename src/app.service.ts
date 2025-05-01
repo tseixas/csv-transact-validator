@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ResponseOperation, Upload } from './app.interface';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Operation } from './app.entity';
+import { Repository } from 'typeorm';
 
 const MAX_AMOUNT = 5000000;
 const MSG_NEGATIVE = 'Negativo';
@@ -29,6 +32,11 @@ function checkDuplicates(data: ResponseOperation[]): ResponseOperation[] {
 
 @Injectable()
 export class AppService {
+  constructor(
+    @InjectRepository(Operation)
+    private readonly operationRepository: Repository<Operation>,
+  ) {}
+
   async processFile(file): Promise<Upload> {
     const fileBuffer = file.buffer;
     const fileName = file.originalname;
@@ -67,6 +75,8 @@ export class AppService {
         });
       }
     }
+
+    await this.operationRepository.save(responseValid.concat(responseInvalid));
 
     return {
       valid: checkDuplicates(responseValid),
