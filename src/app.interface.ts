@@ -1,12 +1,11 @@
-export interface Valid {
-  title: string;
-}
-
-export interface Invalid {
-  title: string;
+export interface ResponseOperation {
+  from: string;
+  to: string;
+  amount: number;
+  message: string;
 }
 
 export interface Upload {
-  valid: Valid[];
-  invalid: Invalid[];
+  valid: ResponseOperation[];
+  invalid: ResponseOperation[];
 }

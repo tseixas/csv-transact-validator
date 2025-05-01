@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Upload } from './app.interface';
+import { ResponseOperation, Upload } from './app.interface';
 
 const MAX_AMOUNT = 5000000;
 const MSG_NEGATIVE = 'Negativo';
@@ -16,66 +16,67 @@ export class AppService {
     const fileBuffer = file.buffer;
     const fileName = file.originalname;
     const data = fileBuffer.toString('utf-8');
+    const lines = data.trim().split('\n');
 
-    console.log('==>', fileBuffer.toString('utf-8'));
+    lines.shift();
+
+    console.log('data: ', data);
     console.log('fileName: ', fileName);
 
     const duplicates = new Set();
-
-    // console.log(data);
-
-    const lines = data.trim().split('\n');
-
-    // console.log(lines);
-
-    const responseValid = [];
-    const responseInvalid = [];
-    const response: Upload = {
-      valid: [],
-      invalid: [],
-    };
+    const responseValid: ResponseOperation[] = [];
+    const responseInvalid: ResponseOperation[] = [];
 
     for (const line of lines) {
-      const [from, to, amountStr] = line.split(';');
-      const amount = Number(amountStr);
+      const [from, to, amount] = line.split(';');
+      const amountValue = Number(amount);
       const lineData = `${from}-${to}-${amount}`;
 
-      // console.log(amount, MAX_AMOUNT);
-      // console.log(lineData);
+      console.log('\n');
+      console.log(amount, MAX_AMOUNT);
+      console.log('lineData: ', lineData);
 
-      const info = [];
+      let info = '';
 
-      if (amount < 0) {
-        info.push(MSG_NEGATIVE);
-      } else if (duplicates.has(lineData)) {
-        info.push(MSG_DUPLICATE);
-      } else if (amount > MAX_AMOUNT) {
-        info.push(MSG_SUSPECT);
-      } else if (info.includes(MSG_NEGATIVE) || info.includes(MSG_DUPLICATE)) {
+      if (amountValue < 0) {
+        info = MSG_NEGATIVE;
+      }
+      if (duplicates.has(lineData)) {
+        info = MSG_DUPLICATE;
+      }
+      if (amountValue > MAX_AMOUNT) {
+        info = MSG_SUSPECT;
+      }
+      if (info === MSG_NEGATIVE || info === MSG_DUPLICATE) {
         responseInvalid.push({
           from: from,
           to: to,
-          amount: amount,
-          msg: info,
+          amount: amountValue,
+          message: info,
         });
       } else {
         responseValid.push({
           from: from,
           to: to,
-          amount: amount,
-          msg: info,
+          amount: amountValue,
+          message: info,
         });
+
         duplicates.add(lineData);
       }
 
       console.log('info', info);
       console.log('has_negativo: ', info.includes(MSG_NEGATIVE));
       console.log('has_duplicado: ', info.includes(MSG_DUPLICATE));
+      console.log('==============================');
     }
 
     console.log('responseValid: ', responseValid);
     console.log('responseInvalid: ', responseInvalid);
 
-    return response;
+    return {
+      valid: responseValid,
+      invalid: responseInvalid,
+    };
   }
 }
