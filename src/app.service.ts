@@ -76,11 +76,18 @@ export class AppService {
       }
     }
 
-    await this.operationRepository.save(responseValid.concat(responseInvalid));
-
-    return {
+    const response = {
       valid: checkDuplicates(responseValid),
       invalid: checkDuplicates(responseInvalid),
     };
+
+    const payload = [
+      ...response.valid.map((item) => ({ ...item, fileName })),
+      ...response.invalid.map((item) => ({ ...item, fileName })),
+    ];
+
+    await this.operationRepository.save(payload);
+
+    return response;
   }
 }
