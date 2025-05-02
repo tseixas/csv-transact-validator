@@ -7,6 +7,7 @@ import {
 import { AppService } from './app.service';
 import { Upload } from './app.interface';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBody, ApiConsumes, ApiOperation } from '@nestjs/swagger';
 
 @Controller()
 export class AppController {
@@ -14,6 +15,19 @@ export class AppController {
 
   @Post()
   @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({ summary: 'Upload do arquivo CSV' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   upload(@UploadedFile() file: Express.Multer.File): Promise<Upload> {
     return this.appService.processFile(file);
   }
