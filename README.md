@@ -14,7 +14,7 @@ Receber um arquivo .csv contendo operações financeiras e validar essa operaç�
 ## Executando o projeto
 Execute o comando Docker abaixo para buildar pela primeira vez e subir a aplicação.
 ```bash
-$ docker compose up --build
+$ docker compose up
 ```
 Acesse o Swagger da aplicação via: http://localhost:3000/api
 
